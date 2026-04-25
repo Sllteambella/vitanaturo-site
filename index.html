@@ -196,19 +196,39 @@ nav.scrolled {
 
 /* Scroll hint */
 .scroll-hint {
-  position: absolute; bottom: 2rem; left: 50%;
+  position: absolute; bottom: 2.5rem; left: 50%;
   transform: translateX(-50%); z-index: 10;
-  display: flex; flex-direction: column; align-items: center; gap: .5rem;
-  font-size: .58rem; letter-spacing: .25em; text-transform: uppercase;
+  display: flex; flex-direction: column; align-items: center; gap: .6rem;
+  font-size: .6rem; letter-spacing: .25em; text-transform: uppercase;
   color: var(--muted); animation: fadeUp 2s ease 1.5s both;
+  cursor: pointer;
 }
 .scroll-arrow {
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  position: relative; display: flex; align-items: center; justify-content: center;
+  width: 56px; height: 56px;
   animation: bounceDown 1.8s ease infinite;
 }
-.scroll-arrow svg { display: block; }
-@keyframes bounceDown { 0%,100%{transform:translateY(0);opacity:.5} 50%{transform:translateY(8px);opacity:1} }
+.scroll-arrow::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  border: 1.5px solid rgba(93,158,114,.45);
+  animation: pulseRing 1.8s ease infinite;
+}
+.scroll-arrow svg { display: block; filter: drop-shadow(0 0 6px rgba(93,158,114,.5)); }
+@keyframes bounceDown { 0%,100%{transform:translateY(0);opacity:.7} 50%{transform:translateY(10px);opacity:1} }
+@keyframes pulseRing { 0%{transform:scale(.8);opacity:0} 50%{opacity:.6} 100%{transform:scale(1.4);opacity:0} }
 @keyframes fadeUp { from{opacity:0;transform:translateX(-50%) translateY(12px)} to{opacity:1;transform:translateX(-50%)} }
+@media(max-width:600px){
+  .scroll-arrow { width: 64px; height: 64px; }
+  .scroll-hint { bottom: 1.8rem; gap: .5rem; }
+  section { padding: 4rem 5%; }
+  .form-row { grid-template-columns: 1fr; }
+  .form-submit { width: 100%; justify-content: center; padding: 1.1rem; font-size: .85rem; }
+  .question-form input, .question-form textarea { font-size: 1rem; }
+  .question-form { gap: .85rem; }
+  nav { padding: .9rem 5%; }
+  .hero-title { font-size: clamp(2rem, 8vw, 3.5rem); }
+  .footer-grid { grid-template-columns: 1fr; }
+}
 
 /* ─── SHARED SECTION ─────────────────────────────── */
 section { padding: 7rem 6%; }
@@ -695,10 +715,10 @@ footer {
       <div class="fi-item" data-frame="3"><span>Équilibre</span><div class="fi-line"></div></div>
     </div>
 
-    <div class="scroll-hint">
+    <div class="scroll-hint" onclick="document.getElementById('freeQuestion').scrollIntoView({behavior:'smooth'})">
       <div class="scroll-arrow">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16 6v20M8 18l8 8 8-8" stroke="#5d9e72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 8v28M11 25l11 11 11-11" stroke="#5d9e72" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <span>Découvrir</span>
