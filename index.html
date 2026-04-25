@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VitaNaturo — Votre guide en phytothérapie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ─────────────────────────────────────── */
+:root {
+  --bg:       #090f0b;
+  --surface:  #0f1a12;
+  --surface2: #152019;
+  --accent:   #5d9e72;
+  --accent2:  #3d7a55;
+  --gold:     #c4a55a;
+  --text:     #f0ead8;
+  --muted:    #7a9484;
+  --border:   rgba(93,158,114,0.14);
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-serif:   'Lora', Georgia, serif;
+}
+
+/* ─── RESET ──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  cursor: none;
+}
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+/* ─── CUSTOM CURSOR ──────────────────────────────── */
+.cursor-dot, .cursor-ring {
+  position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 9999; border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.cursor-dot {
+  width: 5px; height: 5px;
+  background: var(--accent);
+  transition: opacity .2s;
+}
+.cursor-ring {
+  width: 30px; height: 30px;
+  border: 1px solid rgba(93,158,114,.5);
+  transition: width .25s, height .25s, border-color .25s;
+}
+body:has(a:hover) .cursor-ring,
+body:has(button:hover) .cursor-ring {
+  width: 44px; height: 44px;
+  border-color: var(--accent);
+}
+
+/* ─── NAVBAR ─────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1.25rem 5%;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background .4s, backdrop-filter .4s;
+}
+nav.scrolled {
+  background: rgba(9,15,11,.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 1.3rem; font-weight: 400; letter-spacing: .06em;
+  color: var(--text);
+}
+.nav-logo span { color: var(--accent); font-style: italic; }
+.nav-links {
+  display: flex; gap: 2.5rem; list-style: none;
+  font-size: .72rem; letter-spacing: .15em; text-transform: uppercase;
+  color: var(--muted);
+}
+.nav-links a { transition: color .2s; }
+.nav-links a:hover { color: var(--text); cursor: none; }
+.nav-cta {
+  background: var(--accent); color: var(--bg);
+  padding: .65rem 1.6rem; border: none; border-radius: 1px;
+  font-family: var(--font-body); font-size: .72rem; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase; cursor: none;
+  transition: background .2s, transform .15s;
+}
+.nav-cta:hover { background: #6db885; transform: translateY(-1px); }
+
+/* ─── HERO SCROLLYTELLING ────────────────────────── */
+.hero-outer {
+  position: relative; height: 500vh;
+}
+.hero-sticky {
+  position: sticky; top: 0; height: 100vh; overflow: hidden;
+}
+.hero-frame {
+  position: absolute; inset: 0;
+  opacity: 0; transition: opacity .6s ease;
+  will-change: opacity;
+}
+.hero-frame.active { opacity: 1; }
+
+.frame-0 {
+  background:
+    linear-gradient(160deg, rgba(9,15,11,.2) 0%, rgba(9,15,11,.65) 60%),
+    url('images/frame0-herbs.jpg') center/cover no-repeat;
+}
+.frame-1 {
+  background:
+    linear-gradient(160deg, rgba(9,15,11,.15) 0%, rgba(9,15,11,.6) 65%),
+    url('images/frame1-consult.jpg') center 30%/cover no-repeat;
+}
+.frame-2 {
+  background:
+    linear-gradient(160deg, rgba(9,15,11,.1) 0%, rgba(9,15,11,.55) 70%),
+    url('images/frame2-botanical.jpg') center/cover no-repeat;
+}
+.frame-3 {
+  background:
+    linear-gradient(160deg, rgba(9,15,11,.15) 0%, rgba(9,15,11,.55) 60%),
+    url('images/frame3-nature.jpg') center/cover no-repeat;
+}
+
+/* Grain overlay */
+.hero-frame::after {
+  content: ''; position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity: .5; pointer-events: none;
+}
+
+/* Copy overlay */
+.hero-copy {
+  position: absolute; left: 6%; bottom: 15%; z-index: 10;
+  max-width: 580px;
+}
+.hero-eyebrow {
+  font-size: .62rem; letter-spacing: .3em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: .75rem;
+}
+.hero-eyebrow::before {
+  content: ''; width: 28px; height: 1px; background: var(--gold); flex-shrink: 0;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 7vw, 6rem);
+  font-weight: 300; font-style: italic;
+  line-height: .92; letter-spacing: -.01em;
+  margin-bottom: .8rem; color: var(--text);
+}
+.hero-title em { color: var(--accent); font-style: normal; font-weight: 400; }
+.hero-tagline {
+  font-family: var(--font-serif);
+  font-size: clamp(.9rem, 1.8vw, 1.2rem);
+  font-weight: 400; font-style: italic;
+  color: var(--muted); letter-spacing: .04em; margin-bottom: 2rem;
+}
+.hero-actions { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.btn-primary {
+  background: var(--accent); color: var(--bg);
+  padding: .9rem 2.4rem; border: none; border-radius: 1px;
+  font-family: var(--font-body); font-size: .72rem; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; cursor: none;
+  transition: background .2s, transform .15s;
+}
+.btn-primary:hover { background: #6db885; transform: translateY(-1px); }
+.btn-ghost {
+  font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--muted); border-bottom: 1px solid var(--border);
+  padding-bottom: 2px; transition: color .2s, border-color .2s; cursor: none;
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+
+/* Frame indicator */
+.frame-indicator {
+  position: absolute; right: 6%; bottom: 15%; z-index: 10;
+  display: flex; flex-direction: column; gap: 8px; align-items: flex-end;
+}
+.fi-item {
+  display: flex; align-items: center; gap: .6rem;
+  font-size: .58rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--border); transition: color .3s;
+}
+.fi-item.active { color: var(--gold); }
+.fi-line { width: 20px; height: 1px; background: currentColor; transition: width .3s; }
+.fi-item.active .fi-line { width: 36px; }
+
+/* Scroll hint */
+.scroll-hint {
+  position: absolute; bottom: 2rem; left: 50%;
+  transform: translateX(-50%); z-index: 10;
+  display: flex; flex-direction: column; align-items: center; gap: .5rem;
+  font-size: .58rem; letter-spacing: .25em; text-transform: uppercase;
+  color: var(--muted); animation: fadeUp 2s ease 1.5s both;
+}
+.scroll-arrow {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  animation: bounceDown 1.8s ease infinite;
+}
+.scroll-arrow svg { display: block; }
+@keyframes bounceDown { 0%,100%{transform:translateY(0);opacity:.5} 50%{transform:translateY(8px);opacity:1} }
+@keyframes fadeUp { from{opacity:0;transform:translateX(-50%) translateY(12px)} to{opacity:1;transform:translateX(-50%)} }
+
+/* ─── SHARED SECTION ─────────────────────────────── */
+section { padding: 7rem 6%; }
+.section-label {
+  font-size: .6rem; letter-spacing: .35em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1rem;
+  display: flex; align-items: center; gap: .75rem;
+}
+.section-label::before { content: ''; width: 24px; height: 1px; background: var(--gold); flex-shrink: 0; }
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.5vw, 3.8rem);
+  font-weight: 300; font-style: italic;
+  line-height: 1.05; margin-bottom: 1.5rem;
+}
+.section-title em { color: var(--accent); font-style: normal; }
+.section-sub {
+  font-family: var(--font-serif); font-style: italic;
+  font-size: 1.05rem; color: var(--muted); max-width: 560px;
+  line-height: 1.7;
+}
+.divider { width: 100%; height: 1px; background: var(--border); }
+
+/* ─── FREE QUESTION WIDGET ───────────────────────── */
+.question-section {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 5rem 6%;
+  display: flex; gap: 6rem; align-items: flex-start;
+  flex-wrap: wrap;
+}
+.question-left { flex: 1; min-width: 280px; }
+.question-right { flex: 1; min-width: 280px; }
+.free-badge {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: rgba(93,158,114,.12); border: 1px solid rgba(93,158,114,.25);
+  padding: .35rem 1rem; border-radius: 100px;
+  font-size: .65rem; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 1.5rem;
+}
+.free-badge::before { content: '●'; font-size: .4rem; }
+.question-form {
+  display: flex; flex-direction: column; gap: 1rem;
+  margin-top: 2rem;
+}
+.question-form textarea {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 2px; padding: 1rem 1.25rem;
+  color: var(--text); font-family: var(--font-body); font-size: .9rem;
+  resize: none; height: 120px; outline: none;
+  transition: border-color .2s;
+}
+.question-form textarea:focus { border-color: var(--accent); }
+.question-form textarea::placeholder { color: var(--muted); }
+.question-form input {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 2px; padding: .85rem 1.25rem;
+  color: var(--text); font-family: var(--font-body); font-size: .9rem;
+  outline: none; transition: border-color .2s;
+}
+.question-form input:focus { border-color: var(--accent); }
+.question-form input::placeholder { color: var(--muted); }
+.form-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: .75rem;
+}
+.form-label {
+  font-size: .6rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: .3rem; display: block;
+}
+.form-submit {
+  background: var(--accent); color: var(--bg);
+  padding: 1rem 2.4rem; border: none; border-radius: 1px;
+  font-family: var(--font-body); font-size: .8rem; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; cursor: pointer;
+  transition: background .2s, transform .15s; align-self: flex-start;
+  display: flex; align-items: center; gap: .75rem;
+}
+.form-submit:hover { background: #6db885; transform: translateY(-1px); }
+.form-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+.form-submit svg { transition: transform .2s; }
+.form-submit:hover svg { transform: translateX(3px); }
+.question-features {
+  display: flex; flex-direction: column; gap: 1.25rem;
+  margin-top: 2rem;
+}
+.q-feat {
+  display: flex; gap: 1rem; align-items: flex-start;
+}
+.q-feat-icon {
+  width: 36px; height: 36px; flex-shrink: 0;
+  border: 1px solid var(--border); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .8rem; color: var(--accent);
+}
+.q-feat-title { font-size: .85rem; font-weight: 500; margin-bottom: .2rem; }
+.q-feat-desc { font-size: .8rem; color: var(--muted); line-height: 1.5; }
+
+/* ─── HOW IT WORKS ───────────────────────────────── */
+.how-section { background: var(--bg); }
+.steps-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+  margin-top: 4rem;
+}
+.step-card {
+  background: var(--surface); padding: 3rem 2.5rem;
+  border: 1px solid var(--border);
+  position: relative; overflow: hidden;
+  transition: border-color .3s;
+}
+.step-card:hover { border-color: rgba(93,158,114,.35); }
+.step-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 20% 20%, rgba(93,158,114,.06), transparent 60%);
+  pointer-events: none;
+}
+.step-num {
+  font-family: var(--font-display);
+  font-size: 5rem; font-weight: 300; font-style: italic;
+  color: rgba(93,158,114,.15); line-height: 1;
+  margin-bottom: 1.5rem;
+}
+.step-label {
+  font-size: .6rem; letter-spacing: .28em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: .75rem;
+}
+.step-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem; font-weight: 400; font-style: italic;
+  margin-bottom: .75rem;
+}
+.step-desc { font-size: .85rem; color: var(--muted); line-height: 1.65; }
+.step-price {
+  display: inline-block; margin-top: 1.5rem;
+  font-size: .7rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--accent); border: 1px solid rgba(93,158,114,.25);
+  padding: .35rem .9rem; border-radius: 100px;
+}
+.step-price.free { color: var(--gold); border-color: rgba(196,165,90,.25); }
+
+/* ─── PRICING ────────────────────────────────────── */
+.pricing-section { background: var(--surface); }
+.pricing-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+  margin-top: 4rem;
+}
+.pricing-card {
+  background: var(--bg); border: 1px solid var(--border);
+  padding: 3rem 2.5rem; border-radius: 2px;
+  display: flex; flex-direction: column; gap: 0;
+  position: relative; transition: border-color .3s, transform .3s;
+}
+.pricing-card:hover { border-color: rgba(93,158,114,.4); transform: translateY(-4px); }
+.pricing-card.featured {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, rgba(93,158,114,.06) 0%, var(--bg) 50%);
+}
+.pricing-card.featured::before {
+  content: 'POPULAIRE';
+  position: absolute; top: -1px; right: 2rem;
+  background: var(--accent); color: var(--bg);
+  font-size: .55rem; letter-spacing: .2em; font-weight: 600;
+  padding: .3rem .8rem;
+}
+.pricing-tier {
+  font-size: .6rem; letter-spacing: .3em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 1.5rem;
+}
+.pricing-price {
+  font-family: var(--font-display);
+  font-size: 3.5rem; font-weight: 300;
+  line-height: 1; margin-bottom: .4rem;
+}
+.pricing-price sup { font-size: 1.5rem; vertical-align: top; margin-top: .5rem; }
+.pricing-price .free-label {
+  font-family: var(--font-display); font-size: 2.5rem;
+  font-style: italic; color: var(--gold);
+}
+.pricing-billing {
+  font-size: .75rem; color: var(--muted); margin-bottom: 2rem;
+  padding-bottom: 2rem; border-bottom: 1px solid var(--border);
+}
+.pricing-features {
+  list-style: none; display: flex; flex-direction: column; gap: .85rem;
+  flex: 1; margin-bottom: 2.5rem;
+}
+.pricing-features li {
+  display: flex; gap: .75rem; align-items: flex-start;
+  font-size: .85rem; color: var(--muted); line-height: 1.45;
+}
+.pricing-features li::before {
+  content: '✓'; color: var(--accent); font-size: .75rem;
+  flex-shrink: 0; margin-top: .12rem;
+}
+.pricing-features li.muted::before { content: '–'; color: var(--border); }
+.pricing-features li.muted { color: rgba(122,148,132,.4); }
+.pricing-btn {
+  display: block; text-align: center;
+  padding: .9rem; border: 1px solid var(--border);
+  font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+  font-weight: 500; cursor: none;
+  transition: background .2s, border-color .2s, color .2s;
+}
+.pricing-btn:hover { border-color: var(--accent); color: var(--accent); }
+.pricing-btn.primary {
+  background: var(--accent); color: var(--bg); border-color: var(--accent);
+}
+.pricing-btn.primary:hover { background: #6db885; }
+
+/* ─── BOT DEMO ───────────────────────────────────── */
+.bot-section { background: var(--bg); }
+.bot-wrapper {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6rem;
+  align-items: start; margin-top: 4rem;
+}
+.bot-window {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 4px; overflow: hidden;
+}
+.bot-header {
+  background: var(--surface2); padding: .85rem 1.25rem;
+  display: flex; align-items: center; gap: .75rem;
+  border-bottom: 1px solid var(--border);
+}
+.bot-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  font-size: .7rem;
+}
+.bot-name { font-size: .85rem; font-weight: 500; }
+.bot-status {
+  font-size: .68rem; color: var(--accent);
+  display: flex; align-items: center; gap: .3rem;
+}
+.bot-status::before { content: '●'; font-size: .4rem; }
+.bot-messages {
+  padding: 1.25rem; display: flex; flex-direction: column; gap: .85rem;
+  min-height: 300px;
+}
+.msg {
+  max-width: 85%; padding: .7rem 1rem;
+  border-radius: 2px; font-size: .82rem; line-height: 1.55;
+}
+.msg.bot {
+  background: var(--surface2); color: var(--text);
+  align-self: flex-start; border-left: 2px solid var(--accent);
+}
+.msg.user {
+  background: rgba(93,158,114,.12); color: var(--text);
+  align-self: flex-end; border-right: 2px solid var(--accent);
+}
+.msg-time { font-size: .6rem; color: var(--muted); margin-top: .25rem; }
+.bot-typing {
+  display: flex; gap: .3rem; align-items: center; padding: .7rem 1rem;
+  background: var(--surface2); max-width: 70px;
+  align-self: flex-start; border-radius: 2px;
+  border-left: 2px solid var(--accent);
+}
+.typing-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--accent); opacity: .4;
+  animation: typing 1.2s ease infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: .2s; }
+.typing-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes typing { 0%,100%{opacity:.2;transform:translateY(0)} 50%{opacity:1;transform:translateY(-3px)} }
+.bot-input-bar {
+  display: flex; gap: .5rem; padding: .85rem 1.25rem;
+  border-top: 1px solid var(--border);
+}
+.bot-input {
+  flex: 1; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 100px; padding: .5rem 1rem;
+  color: var(--muted); font-size: .8rem; outline: none;
+}
+.bot-send {
+  background: var(--accent); color: var(--bg); border: none;
+  border-radius: 50%; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .7rem; cursor: none; flex-shrink: 0;
+}
+.bot-upsell {
+  background: rgba(93,158,114,.08); border: 1px solid rgba(93,158,114,.2);
+  border-radius: 2px; padding: .85rem 1rem; font-size: .8rem;
+  display: flex; flex-direction: column; gap: .5rem; margin: 0 1.25rem 1.25rem;
+}
+.upsell-title { font-size: .68rem; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); }
+.upsell-options { display: flex; gap: .5rem; flex-wrap: wrap; }
+.upsell-opt {
+  border: 1px solid var(--border); padding: .35rem .75rem;
+  border-radius: 100px; font-size: .72rem; cursor: none;
+  transition: border-color .2s, color .2s;
+}
+.upsell-opt:hover { border-color: var(--accent); color: var(--accent); }
+/* Bot right side */
+.bot-features { display: flex; flex-direction: column; gap: 2.5rem; }
+.bot-feat { display: flex; gap: 1.5rem; align-items: flex-start; }
+.bot-feat-num {
+  font-family: var(--font-display);
+  font-size: 2.5rem; font-weight: 300; font-style: italic;
+  color: rgba(93,158,114,.3); line-height: 1; flex-shrink: 0; width: 3rem;
+}
+.bot-feat-title { font-size: .95rem; font-weight: 500; margin-bottom: .4rem; }
+.bot-feat-desc { font-size: .82rem; color: var(--muted); line-height: 1.6; }
+
+/* ─── TESTIMONIALS ───────────────────────────────── */
+.testimonials-section { background: var(--surface); overflow: hidden; }
+.testimonials-track-wrap { overflow: hidden; margin-top: 3.5rem; }
+.testimonials-track {
+  display: flex; gap: 1.5rem;
+  animation: scroll-track 30s linear infinite;
+  width: max-content;
+}
+.testimonials-track:hover { animation-play-state: paused; }
+@keyframes scroll-track { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.testi-card {
+  background: var(--bg); border: 1px solid var(--border);
+  padding: 2rem 2.25rem; width: 320px; flex-shrink: 0;
+  border-radius: 2px;
+}
+.testi-stars { color: var(--gold); font-size: .7rem; margin-bottom: 1rem; letter-spacing: .15em; }
+.testi-text {
+  font-family: var(--font-serif); font-style: italic;
+  font-size: .9rem; color: var(--text); line-height: 1.65;
+  margin-bottom: 1.25rem;
+}
+.testi-author { font-size: .75rem; color: var(--muted); }
+.testi-author strong { color: var(--text); display: block; margin-bottom: .1rem; }
+
+/* ─── FAQ ────────────────────────────────────────── */
+.faq-section { background: var(--bg); }
+.faq-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0 5rem;
+  margin-top: 3.5rem;
+}
+.faq-item {
+  border-bottom: 1px solid var(--border); padding: 1.75rem 0;
+}
+.faq-q {
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: none; gap: 1rem;
+}
+.faq-q-text { font-size: .9rem; font-weight: 500; }
+.faq-icon {
+  width: 20px; height: 20px; flex-shrink: 0;
+  border: 1px solid var(--border); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .65rem; color: var(--accent);
+  transition: transform .3s;
+}
+.faq-item.open .faq-icon { transform: rotate(45deg); }
+.faq-a {
+  font-size: .82rem; color: var(--muted); line-height: 1.7;
+  max-height: 0; overflow: hidden; transition: max-height .4s ease, padding-top .3s;
+}
+.faq-item.open .faq-a { max-height: 200px; padding-top: 1rem; }
+
+/* ─── CTA BANNER ─────────────────────────────────── */
+.cta-section {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 6rem 6%; text-align: center;
+}
+.cta-eyebrow {
+  font-size: .6rem; letter-spacing: .35em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1.5rem;
+}
+.cta-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 4.5rem);
+  font-weight: 300; font-style: italic;
+  max-width: 700px; margin: 0 auto 1.5rem;
+  line-height: 1;
+}
+.cta-title em { color: var(--accent); font-style: normal; }
+.cta-sub {
+  font-family: var(--font-serif); font-style: italic;
+  font-size: 1rem; color: var(--muted);
+  max-width: 480px; margin: 0 auto 2.5rem;
+}
+.cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+/* ─── FOOTER ─────────────────────────────────────── */
+footer {
+  background: var(--bg); border-top: 1px solid var(--border);
+  padding: 5rem 6% 2.5rem;
+}
+.footer-grid {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 4rem; margin-bottom: 4rem;
+}
+.footer-brand-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem; font-weight: 400; letter-spacing: .06em;
+  margin-bottom: 1rem;
+}
+.footer-brand-name span { color: var(--accent); font-style: italic; }
+.footer-tagline {
+  font-family: var(--font-serif); font-style: italic;
+  font-size: .85rem; color: var(--muted); line-height: 1.6;
+  margin-bottom: 1.5rem; max-width: 260px;
+}
+.footer-legal { font-size: .72rem; color: rgba(122,148,132,.4); }
+.footer-col-title {
+  font-size: .6rem; letter-spacing: .28em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1.25rem;
+}
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+.footer-links a {
+  font-size: .82rem; color: var(--muted); transition: color .2s; cursor: none;
+}
+.footer-links a:hover { color: var(--text); }
+.footer-bottom {
+  border-top: 1px solid var(--border); padding-top: 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: .72rem; color: rgba(122,148,132,.5);
+  flex-wrap: wrap; gap: 1rem;
+}
+
+/* ─── ANIMATIONS ─────────────────────────────────── */
+.reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: .15s; }
+.reveal-delay-2 { transition-delay: .3s; }
+.reveal-delay-3 { transition-delay: .45s; }
+
+/* ─── RESPONSIVE ─────────────────────────────────── */
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .steps-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .bot-wrapper { grid-template-columns: 1fr; }
+  .faq-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .question-section { flex-direction: column; gap: 3rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Cursors -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ─── NAV ───────────────────────────────────────── -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">Vita<span>Naturo</span></a>
+  <ul class="nav-links">
+    <li><a href="#comment">Comment ça marche</a></li>
+    <li><a href="#tarifs">Tarifs</a></li>
+    <li><a href="#bot">Le bot</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('question').focus()">Question gratuite</button>
+</nav>
+
+<!-- ─── HERO ──────────────────────────────────────── -->
+<div class="hero-outer" id="heroOuter">
+  <div class="hero-sticky">
+    <div class="hero-frame frame-0 active" id="f0"></div>
+    <div class="hero-frame frame-1" id="f1"></div>
+    <div class="hero-frame frame-2" id="f2"></div>
+    <div class="hero-frame frame-3" id="f3"></div>
+
+    <div class="hero-copy" id="heroCopy">
+      <p class="hero-eyebrow" id="heroEyebrow">Phytothérapie · Conseil personnalisé</p>
+      <h1 class="hero-title" id="heroTitle">Les plantes<br>comme première<br><em>médecine</em></h1>
+      <p class="hero-tagline" id="heroTagline">Un premier avis gratuit, des conseils sur-mesure, un praticien si besoin.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="document.getElementById('question').focus()">Poser ma première question</button>
+        <a href="#tarifs" class="btn-ghost">Voir les formules →</a>
+      </div>
+    </div>
+
+    <div class="frame-indicator">
+      <div class="fi-item active" data-frame="0"><span>Plantes</span><div class="fi-line"></div></div>
+      <div class="fi-item" data-frame="1"><span>Conseil</span><div class="fi-line"></div></div>
+      <div class="fi-item" data-frame="2"><span>Actifs</span><div class="fi-line"></div></div>
+      <div class="fi-item" data-frame="3"><span>Équilibre</span><div class="fi-line"></div></div>
+    </div>
+
+    <div class="scroll-hint">
+      <div class="scroll-arrow">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 6v20M8 18l8 8 8-8" stroke="#5d9e72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span>Découvrir</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FREE QUESTION ─────────────────────────────── -->
+<div class="question-section" id="freeQuestion">
+  <div class="question-left">
+    <div class="free-badge">1ère question gratuite</div>
+    <h2 class="section-title" style="font-size:clamp(1.8rem,3.5vw,2.8rem)">Posez votre question,<br><em>maintenant</em></h2>
+    <p class="section-sub">Notre IA spécialisée en phytothérapie vous répond sous quelques secondes. Sans inscription. Sans engagement.</p>
+    <form class="question-form" id="questionForm" onsubmit="submitQuestion(event)">
+      <div class="form-row">
+        <div><label class="form-label" for="fieldPrenom">Prénom *</label><input id="fieldPrenom" type="text" placeholder="Marie" required></div>
+        <div><label class="form-label" for="fieldNom">Nom *</label><input id="fieldNom" type="text" placeholder="Dupont" required></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label" for="fieldAge">Âge *</label><input id="fieldAge" type="number" placeholder="42" min="1" max="120" required></div>
+        <div><label class="form-label" for="fieldPoids">Poids (kg) *</label><input id="fieldPoids" type="number" placeholder="68" min="20" max="300" required></div>
+        <div><label class="form-label" for="fieldTaille">Taille (cm) *</label><input id="fieldTaille" type="number" placeholder="170" min="50" max="250" required></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label" for="fieldVille">Ville</label><input id="fieldVille" type="text" placeholder="Lyon"></div>
+        <div><label class="form-label" for="fieldTelegram">Compte Telegram</label><input id="fieldTelegram" type="text" placeholder="@monpseudo"></div>
+      </div>
+      <div><label class="form-label" for="questionEmail">Email *</label><input id="questionEmail" type="email" placeholder="marie@email.com" required></div>
+      <div><label class="form-label" for="fieldAllergies">Allergies connues</label><input id="fieldAllergies" type="text" placeholder="Aucune, ou ex : aspirine, latex…"></div>
+      <div><label class="form-label" for="fieldTraitements">Traitements médicaux actuels</label><textarea id="fieldTraitements" placeholder="Aucun, ou listez vos médicaments en cours…" rows="2"></textarea></div>
+      <div><label class="form-label" for="questionText">Votre question *</label><textarea id="questionText" placeholder="Ex : Quelle plante peut m'aider à mieux dormir sans effets secondaires ?" rows="4" required></textarea></div>
+      <button class="form-submit" id="formSubmitBtn" type="submit">
+        Obtenir mon conseil gratuit
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9h12M10 4l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <p style="font-size:.72rem;color:var(--muted)">Réponse IA immédiate · Aucune carte requise · Données protégées</p>
+    </form>
+    <div id="formSuccess" style="display:none;flex-direction:column;gap:1.25rem;margin-top:2rem">
+      <div style="display:flex;align-items:center;gap:.75rem;color:var(--accent);font-size:1.05rem;font-weight:500">
+        <span style="width:28px;height:28px;border:1px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem">✓</span>
+        Votre réponse est en route !
+      </div>
+      <p style="font-size:.88rem;color:var(--muted);line-height:1.65">Vérifiez votre boîte email (et le dossier spam). La réponse détaillée arrive dans quelques secondes.</p>
+      <div style="padding:1.25rem;background:var(--surface2);border:1px solid var(--border);border-radius:2px">
+        <p style="font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem">Continuer sur Telegram</p>
+        <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">Posez vos questions de suivi directement au bot :</p>
+        <a href="https://t.me/VitaNaturoBot" target="_blank" style="display:inline-flex;align-items:center;gap:.5rem;background:var(--accent);color:var(--bg);padding:.75rem 1.5rem;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;text-decoration:none">Ouvrir le bot →</a>
+      </div>
+    </div>
+  </div>
+  <div class="question-right">
+    <div class="question-features">
+      <div class="q-feat">
+        <div class="q-feat-icon">✦</div>
+        <div>
+          <div class="q-feat-title">IA formée en phytothérapie</div>
+          <div class="q-feat-desc">Nos modèles intègrent la pharmacopée française et européenne, les interactions médicamenteuses connues et les contre-indications.</div>
+        </div>
+      </div>
+      <div class="q-feat">
+        <div class="q-feat-icon">⊕</div>
+        <div>
+          <div class="q-feat-title">Réponse personnalisée, pas générique</div>
+          <div class="q-feat-desc">Le bot pose des questions de contexte pour adapter son conseil à votre situation : âge, traitements en cours, objectif.</div>
+        </div>
+      </div>
+      <div class="q-feat">
+        <div class="q-feat-icon">◈</div>
+        <div>
+          <div class="q-feat-title">Relai praticien si nécessaire</div>
+          <div class="q-feat-desc">En cas de situation complexe ou sensible, notre naturopathe prend le relai dans les 24h pour une consultation dédiée.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── HOW IT WORKS ───────────────────────────────── -->
+<section class="how-section" id="comment">
+  <div class="section-label reveal">Comment ça marche</div>
+  <h2 class="section-title reveal">Trois niveaux,<br>un seul <em>parcours</em></h2>
+  <p class="section-sub reveal">Commencez gratuitement. Allez plus loin selon vos besoins.</p>
+  <div class="steps-grid" style="margin-top:4rem">
+    <div class="step-card reveal">
+      <div class="step-num">01</div>
+      <div class="step-label">Gratuit</div>
+      <h3 class="step-title">Votre première question</h3>
+      <p class="step-desc">Posez une question sur les plantes médicinales, les huiles essentielles ou la naturopathie. Notre IA vous répond immédiatement avec une réponse sourcée et personnalisée.</p>
+      <span class="step-price free">Gratuit · Sans inscription</span>
+    </div>
+    <div class="step-card reveal reveal-delay-1">
+      <div class="step-num">02</div>
+      <div class="step-label">20 €</div>
+      <h3 class="step-title">Pack 3 questions</h3>
+      <p class="step-desc">Accédez à notre bot Telegram expert en phytothérapie. 3 questions approfondies avec contexte, interactions, posologie et sources scientifiques. Valable 30 jours.</p>
+      <span class="step-price">Pack IA · 20 €</span>
+    </div>
+    <div class="step-card reveal reveal-delay-2">
+      <div class="step-num">03</div>
+      <div class="step-label">85 €</div>
+      <h3 class="step-title">Consultation praticien</h3>
+      <p class="step-desc">45 minutes en visioconférence avec un naturopathe certifié. Bilan complet, plan de soins personnalisé et suivi 7 jours par message. Pour les cas complexes ou chroniques.</p>
+      <span class="step-price">Consultation · 85 €</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ─── PRICING ────────────────────────────────────── -->
+<section class="pricing-section" id="tarifs">
+  <div class="section-label reveal">Nos formules</div>
+  <h2 class="section-title reveal">Simple, transparent,<br><em>sans surprise</em></h2>
+  <div class="pricing-grid">
+    <!-- Free -->
+    <div class="pricing-card reveal">
+      <div class="pricing-tier">Découverte</div>
+      <div class="pricing-price"><span class="free-label">Gratuit</span></div>
+      <div class="pricing-billing">Pour commencer, sans engagement</div>
+      <ul class="pricing-features">
+        <li>1 question répondue par l'IA</li>
+        <li>Réponse immédiate et sourcée</li>
+        <li>Accès aux fiches plantes de base</li>
+        <li class="muted">Questions de suivi</li>
+        <li class="muted">Interactions médicamenteuses</li>
+        <li class="muted">Consultation praticien</li>
+      </ul>
+      <a href="#freeQuestion" class="pricing-btn">Commencer →</a>
+    </div>
+    <!-- Pack IA -->
+    <div class="pricing-card featured reveal reveal-delay-1">
+      <div class="pricing-tier">Pack IA</div>
+      <div class="pricing-price"><sup>€</sup>20</div>
+      <div class="pricing-billing">3 questions · Valable 30 jours</div>
+      <ul class="pricing-features">
+        <li>3 questions approfondies</li>
+        <li>Réponses personnalisées sous 24h</li>
+        <li>Interactions & contre-indications</li>
+        <li>Posologie & sources scientifiques</li>
+        <li>Accès Telegram bot 24/7</li>
+        <li class="muted">Consultation praticien</li>
+      </ul>
+      <a href="#bot" class="pricing-btn primary">Accéder au bot →</a>
+    </div>
+    <!-- Praticien -->
+    <div class="pricing-card reveal reveal-delay-2">
+      <div class="pricing-tier">Consultation</div>
+      <div class="pricing-price"><sup>€</sup>85</div>
+      <div class="pricing-billing">Session 45 min + suivi 7 jours</div>
+      <ul class="pricing-features">
+        <li>45 min en visioconférence</li>
+        <li>Naturopathe certifié FENA</li>
+        <li>Bilan personnalisé complet</li>
+        <li>Plan de soins sur-mesure</li>
+        <li>Suivi 7 jours par message</li>
+        <li>Compte-rendu PDF inclus</li>
+      </ul>
+      <a href="https://calendly.com/sllteam1970/consultation-vitanaturo-45-min" target="_blank" class="pricing-btn">Prendre rendez-vous →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── BOT ────────────────────────────────────────── -->
+<section class="bot-section" id="bot">
+  <div class="section-label reveal">Le bot VitaNaturo</div>
+  <h2 class="section-title reveal">Un expert dans votre<br><em>poche</em></h2>
+  <div class="bot-wrapper">
+    <!-- Fenêtre bot simulée -->
+    <div class="bot-window reveal">
+      <div class="bot-header">
+        <div class="bot-avatar">🌿</div>
+        <div>
+          <div class="bot-name">VitaNaturo Bot</div>
+          <div class="bot-status">En ligne</div>
+        </div>
+      </div>
+      <div class="bot-messages" id="botMessages">
+        <div class="msg bot">
+          Bonjour ! Je suis votre assistant en phytothérapie. Quelle est votre question ?
+          <div class="msg-time">09:14</div>
+        </div>
+        <div class="msg user">
+          J'ai des troubles du sommeil depuis 2 semaines, j'évite les somnifères. Que me conseillez-vous ?
+          <div class="msg-time">09:15</div>
+        </div>
+      </div>
+      <div class="bot-typing" id="botTyping" style="display:none;margin:0 1.25rem .75rem">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+      <div class="bot-upsell" id="botUpsell" style="display:none">
+        <div class="upsell-title">Aller plus loin</div>
+        <div style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem">Pour un suivi complet de votre sommeil :</div>
+        <div class="upsell-options">
+          <div class="upsell-opt">Pack 3 questions — 20 €</div>
+          <div class="upsell-opt">Consultation praticien — 85 €</div>
+        </div>
+      </div>
+      <div class="bot-input-bar">
+        <input class="bot-input" id="botInput" placeholder="Posez votre question...">
+        <button class="bot-send" onclick="triggerBotDemo()">→</button>
+      </div>
+    </div>
+    <!-- Features -->
+    <div class="bot-features">
+      <div class="bot-feat reveal">
+        <div class="bot-feat-num">01</div>
+        <div>
+          <div class="bot-feat-title">Disponible 24h/24 sur Telegram</div>
+          <div class="bot-feat-desc">Plus besoin d'attendre un RDV. Le bot répond à toute heure, week-end compris. Idéal pour les questions urgentes non-médicales.</div>
+        </div>
+      </div>
+      <div class="bot-feat reveal reveal-delay-1">
+        <div class="bot-feat-num">02</div>
+        <div>
+          <div class="bot-feat-title">Contexte mémorisé dans la session</div>
+          <div class="bot-feat-desc">Le bot retient vos réponses précédentes pour personnaliser chaque conseil : vos traitements en cours, vos allergies, votre objectif.</div>
+        </div>
+      </div>
+      <div class="bot-feat reveal reveal-delay-2">
+        <div class="bot-feat-num">03</div>
+        <div>
+          <div class="bot-feat-title">Escalade intelligente vers le praticien</div>
+          <div class="bot-feat-desc">Si votre cas dépasse le champ de l'IA (pathologie chronique, grossesse, enfant de moins de 12 ans), le bot vous oriente immédiatement vers notre naturopathe.</div>
+        </div>
+      </div>
+      <div class="bot-feat reveal reveal-delay-3">
+        <div class="bot-feat-num">04</div>
+        <div>
+          <div class="bot-feat-title">Sources et précautions toujours incluses</div>
+          <div class="bot-feat-desc">Chaque réponse cite ses sources (ANSM, ESCOP, Commission E) et liste les contre-indications connues. La transparence est non-négociable.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIALS ───────────────────────────────── -->
+<section class="testimonials-section">
+  <div class="section-label reveal">Témoignages</div>
+  <h2 class="section-title reveal">Ce qu'ils en <em>disent</em></h2>
+  <div class="testimonials-track-wrap">
+    <div class="testimonials-track">
+      <!-- 6 temoignages x2 pour loop infini -->
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">« J'avais des douleurs articulaires depuis des mois. Le bot m'a conseillé la griffe du diable et l'harpagophytum en détaillant les doses. En 3 semaines, nette amélioration. »</p><div class="testi-author"><strong>Martine, 54 ans</strong>Pack IA · Lyon</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">« La consultation avec la naturopathe a tout changé. Elle m'a concocté un protocole complet stress + digestion. Je le suis depuis 2 mois, c'est transformateur. »</p><div class="testi-author"><strong>Thomas, 38 ans</strong>Consultation · Paris</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★☆</div><p class="testi-text">« Question gratuite répondue en 30 secondes, top. Le conseil sur la valériane était précis et j'ai enfin dormi une nuit complète après des semaines de galère. »</p><div class="testi-author"><strong>Camille, 29 ans</strong>Question gratuite · Bordeaux</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">« Mon médecin ne savait plus quoi faire pour mon anxiété chronique. Le bot + la consultation praticien m'ont donné une alternative naturelle qui fonctionne vraiment. »</p><div class="testi-author"><strong>Sophie, 45 ans</strong>Consultation · Nantes</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">« J'avais peur que ce soit générique comme ChatGPT. Pas du tout — le bot m'a demandé mes traitements en cours, a vérifié les interactions et m'a donné un conseil vraiment personnalisé. »</p><div class="testi-author"><strong>Marc, 62 ans</strong>Pack IA · Toulouse</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">« Rapport qualité-prix imbattable. 20€ pour 3 questions avec un niveau d'expertise pareil, c'est donné. J'en suis à mon 3ème pack. »</p><div class="testi-author"><strong>Aurélie, 33 ans</strong>Pack IA · Marseille</div></div>
+      <!-- clone pour loop -->
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">« J'avais des douleurs articulaires depuis des mois. Le bot m'a conseillé la griffe du diable et l'harpagophytum en détaillant les doses. En 3 semaines, nette amélioration. »</p><div class="testi-author"><strong>Martine, 54 ans</strong>Pack IA · Lyon</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">« La consultation avec la naturopathe a tout changé. Elle m'a concocté un protocole complet stress + digestion. Je le suis depuis 2 mois, c'est transformateur. »</p><div class="testi-author"><strong>Thomas, 38 ans</strong>Consultation · Paris</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★☆</div><p class="testi-text">« Question gratuite répondue en 30 secondes, top. Le conseil sur la valériane était précis et j'ai enfin dormi une nuit complète après des semaines de galère. »</p><div class="testi-author"><strong>Camille, 29 ans</strong>Question gratuite · Bordeaux</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">« Mon médecin ne savait plus quoi faire pour mon anxiété chronique. Le bot + la consultation praticien m'ont donné une alternative naturelle qui fonctionne vraiment. »</p><div class="testi-author"><strong>Sophie, 45 ans</strong>Consultation · Nantes</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">« J'avais peur que ce soit générique comme ChatGPT. Pas du tout — le bot m'a demandé mes traitements en cours, a vérifié les interactions et m'a donné un conseil vraiment personnalisé. »</p><div class="testi-author"><strong>Marc, 62 ans</strong>Pack IA · Toulouse</div></div>
+      <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">« Rapport qualité-prix imbattable. 20€ pour 3 questions avec un niveau d'expertise pareil, c'est donné. J'en suis à mon 3ème pack. »</p><div class="testi-author"><strong>Aurélie, 33 ans</strong>Pack IA · Marseille</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FAQ ────────────────────────────────────────── -->
+<section class="faq-section" id="faq">
+  <div class="section-label reveal">FAQ</div>
+  <h2 class="section-title reveal">Questions <em>fréquentes</em></h2>
+  <div class="faq-grid">
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">L'IA remplace-t-elle un médecin ?</span>
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-a">Non. VitaNaturo est un outil d'information en phytothérapie et naturopathie. Nos conseils ne constituent pas un diagnostic médical. En cas de symptômes persistants ou sévères, consultez toujours un médecin. Notre bot vous le rappelle systématiquement si votre situation le justifie.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">Qui sont vos naturopathes praticiens ?</span>
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-a">Tous nos praticiens sont certifiés FENA (Fédération Française de Naturopathie) avec au moins 5 ans d'expérience. Chaque profil est vérifié et régulièrement évalué via les retours de nos utilisateurs.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">Comment fonctionne le Pack 3 questions ?</span>
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-a">Après paiement (20 €), vous recevez un lien d'accès au bot Telegram privé VitaNaturo. Vous disposez de 3 questions à utiliser sur 30 jours. Chaque question peut faire l'objet d'échanges jusqu'à 3 messages de suivi dans le même fil.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">Mes données médicales sont-elles sécurisées ?</span>
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-a">Oui. Vos données sont stockées en Europe (hébergement HDS), chiffrées en transit et au repos. Nous ne revendons aucune donnée. Vous pouvez demander la suppression de votre compte à tout moment depuis vos paramètres.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">Peut-on obtenir un remboursement ?</span>
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-a">Le Pack IA est remboursable sous 48h si vous n'avez pas encore utilisé de questions. Les consultations praticiens sont remboursables jusqu'à 24h avant le RDV. Contactez support@vitanaturo.fr.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span class="faq-q-text">Quels sujets le bot ne traite-t-il pas ?</span>
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-a">Le bot ne donne pas de conseils pour les femmes enceintes (sans consultation préalable), les enfants de moins de 12 ans, les pathologies graves (cancer, insuffisance rénale, etc.) ou les urgences médicales. Dans ces cas, il vous redirige vers le bon interlocuteur.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ────────────────────────────────────────── -->
+<section class="cta-section">
+  <p class="cta-eyebrow reveal">Commencez maintenant</p>
+  <h2 class="cta-title reveal">Votre première question<br>est <em>gratuite</em></h2>
+  <p class="cta-sub reveal">Pas d'inscription, pas de carte bancaire. Juste votre question et une réponse d'expert.</p>
+  <div class="cta-actions reveal">
+    <button class="btn-primary" onclick="document.getElementById('question').focus();document.getElementById('freeQuestion').scrollIntoView({behavior:'smooth'})">Poser ma question →</button>
+    <a href="#tarifs" class="btn-ghost">Voir les formules →</a>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─────────────────────────────────────── -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-name">Vita<span>Naturo</span></div>
+      <p class="footer-tagline">La phytothérapie accessible à tous. Des conseils naturels, sourcés et personnalisés — du bot à la consultation.</p>
+      <p class="footer-legal">© 2026 VitaNaturo · Mentions légales · Politique de confidentialité</p>
+    </div>
+    <div>
+      <p class="footer-col-title">Formules</p>
+      <ul class="footer-links">
+        <li><a href="#freeQuestion">Question gratuite</a></li>
+        <li><a href="#tarifs">Pack IA — 20 €</a></li>
+        <li><a href="#tarifs">Consultation — 85 €</a></li>
+        <li><a href="#bot">Le bot Telegram</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">À propos</p>
+      <ul class="footer-links">
+        <li><a href="#">Notre équipe</a></li>
+        <li><a href="#">Nos praticiens</a></li>
+        <li><a href="#">Méthodologie</a></li>
+        <li><a href="#">Blog phytothérapie</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Support</p>
+      <ul class="footer-links">
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">CGV</a></li>
+        <li><a href="#">Mentions légales</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>VitaNaturo — Phytothérapie & Naturopathie</span>
+    <span>Information non médicale · Toujours consulter un professionnel de santé pour tout diagnostic</span>
+  </div>
+</footer>
+
+<script>
+/* ─── CURSOR ───────────────────── */
+const dot = document.getElementById('cursorDot');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function animCursor() {
+  dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+  rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animCursor);
+})();
+
+/* ─── NAVBAR SCROLL ────────────── */
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+/* ─── HERO SCROLLYTELLING ──────── */
+const heroOuter = document.getElementById('heroOuter');
+const frames = [
+  document.getElementById('f0'),
+  document.getElementById('f1'),
+  document.getElementById('f2'),
+  document.getElementById('f3'),
+];
+const fiItems = document.querySelectorAll('.fi-item');
+const heroTitle = document.getElementById('heroTitle');
+const heroTagline = document.getElementById('heroTagline');
+const heroEyebrow = document.getElementById('heroEyebrow');
+
+const frameData = [
+  { eyebrow: 'Phytothérapie · Conseil personnalisé', title: 'Les plantes<br>comme première<br><em>médecine</em>', tagline: 'Un premier avis gratuit, des conseils sur-mesure, un praticien si besoin.' },
+  { eyebrow: 'Conseils personnalisés · IA spécialisée', title: 'Votre question,<br>une réponse<br><em>d\'expert</em>', tagline: 'Notre IA intègre pharmacopée française et interactions médicamenteuses.' },
+  { eyebrow: 'Phytochimie · Actifs naturels', title: 'La puissance<br>des actifs<br><em>naturels</em>', tagline: 'Dosages précis, contre-indications identifiées, sources scientifiques citées.' },
+  { eyebrow: 'Praticiens certifiés · Visio 45 min', title: 'L\'humain quand<br>vous en avez<br><em>besoin</em>', tagline: 'Un naturopathe certifié FENA prend le relai pour les cas complexes.' },
+];
+
+let currentFrame = 0;
+function setFrame(idx) {
+  if (idx === currentFrame) return;
+  frames[currentFrame].classList.remove('active');
+  fiItems[currentFrame].classList.remove('active');
+  currentFrame = idx;
+  frames[currentFrame].classList.add('active');
+  fiItems[currentFrame].classList.add('active');
+  const d = frameData[idx];
+  heroEyebrow.textContent = d.eyebrow;
+  heroTitle.innerHTML = d.title;
+  heroTagline.textContent = d.tagline;
+}
+
+window.addEventListener('scroll', () => {
+  const rect = heroOuter.getBoundingClientRect();
+  const total = heroOuter.offsetHeight - window.innerHeight;
+  const scrolled = -rect.top;
+  if (scrolled < 0 || scrolled > total) return;
+  const progress = scrolled / total;
+  const idx = Math.min(3, Math.floor(progress * 4));
+  setFrame(idx);
+});
+
+/* ─── REVEAL ON SCROLL ─────────── */
+const reveals = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.15 });
+reveals.forEach(el => revealObs.observe(el));
+
+/* ─── FAQ ──────────────────────── */
+function toggleFaq(el) {
+  const item = el.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+/* ─── BOT DEMO ─────────────────── */
+const botResponses = [
+  'Le <strong>tilleul</strong> (Tilia cordata) et la <strong>passiflore</strong> (Passiflora incarnata) sont d\'excellents hypnotiques doux. En infusion : 2g/tasse de tilleul, 15 min avant coucher. La passiflore agit sur l\'anxiété sous-jacente au sommeil. Aucune interaction connue avec les médicaments courants. Voulez-vous des précisions sur les formes (gélules, teinture-mère) ?',
+];
+let botDemoStep = 0;
+function triggerBotDemo() {
+  if (botDemoStep > 0) return;
+  botDemoStep = 1;
+  const msgs = document.getElementById('botMessages');
+  const typing = document.getElementById('botTyping');
+  const upsell = document.getElementById('botUpsell');
+  typing.style.display = 'flex';
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    typing.style.display = 'none';
+    const msg = document.createElement('div');
+    msg.className = 'msg bot';
+    msg.innerHTML = botResponses[0] + '<div class="msg-time">09:16</div>';
+    msgs.appendChild(msg);
+    msgs.scrollTop = msgs.scrollHeight;
+    setTimeout(() => { upsell.style.display = 'flex'; }, 800);
+  }, 2200);
+}
+document.getElementById('botInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') triggerBotDemo();
+});
+
+/* ─── QUESTION FORM ────────────── */
+async function submitQuestion(e) {
+  e.preventDefault();
+  const btn = document.getElementById('formSubmitBtn');
+  const payload = {
+    prenom:      document.getElementById('fieldPrenom').value.trim(),
+    nom:         document.getElementById('fieldNom').value.trim(),
+    age:         document.getElementById('fieldAge').value.trim(),
+    poids:       document.getElementById('fieldPoids').value.trim(),
+    taille:      document.getElementById('fieldTaille').value.trim(),
+    ville:       document.getElementById('fieldVille').value.trim(),
+    telegram:    document.getElementById('fieldTelegram').value.trim(),
+    email:       document.getElementById('questionEmail').value.trim(),
+    allergies:   document.getElementById('fieldAllergies').value.trim(),
+    traitements: document.getElementById('fieldTraitements').value.trim(),
+    question:    document.getElementById('questionText').value.trim(),
+  };
+  if (!payload.prenom || !payload.nom || !payload.age || !payload.email || !payload.question) return;
+
+  btn.innerHTML = 'Envoi en cours… <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.6" stroke-dasharray="22" stroke-dashoffset="22" style="animation:spin 1s linear infinite"><animateTransform attributeName="transform" type="rotate" from="0 9 9" to="360 9 9" dur="0.8s" repeatCount="indefinite"/></circle></svg>';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/question', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error('server error');
+    document.getElementById('questionForm').style.display = 'none';
+    document.getElementById('formSuccess').style.display  = 'flex';
+  } catch {
+    btn.innerHTML = 'Obtenir mon conseil gratuit <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9h12M10 4l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    btn.disabled = false;
+    alert('Une erreur est survenue. Merci de réessayer.');
+  }
+}
+</script>
+</body>
+</html>
