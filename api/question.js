@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import nodemailer from 'nodemailer';
-import { getDb } from '../lib/firestoreClient.js';
+import { getCachedPlants, saveConsultation } from '../lib/firestoreClient.js';
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 8;
@@ -111,13 +111,26 @@ export default async function handler(req, res) {
     });
     const answer = message.content[0].text;
 
-    if (!isDryRun) {
-      await Promise.allSettled([
+    await Promise.allSettled([
+      saveConsultation({
+        email,
+        prenom: cleanOptionalString(prenom, 80) || null,
+        nom: cleanOptionalString(nom, 80) || null,
+        age: normalizedAge,
+        poids: normalizedPoids,
+        taille: normalizedTaille,
+        imc: imc ? parseFloat(imc) : null,
+        ville: cleanOptionalString(ville, 120) || null,
+        question: trimmedQuestion,
+        answer,
+        dry_run: isDryRun,
+      }),
+      ...(!isDryRun ? [
         sendEmail(email, trimmedQuestion, answer),
         process.env.HUBSPOT_TOKEN ? hubspotUpsert(email, trimmedQuestion, answer) : Promise.resolve(),
         process.env.TELEGRAM_ADMIN_ID ? notifyAdmin(email, trimmedQuestion, answer, body) : Promise.resolve(),
-      ]);
-    }
+      ] : []),
+    ]);
 
     res.json({ ok: true, dryRun: isDryRun });
   } catch (err) {
@@ -308,42 +321,46 @@ function parseBooleanEnv(value) {
   return ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase());
 }
 
+// Scoring pondéré : correspondance sur le nom vaut 4×, propriétés/usage 2×, full_text 1×
 async function getPlantContext(keywords) {
-  if (!isNonEmptyString(keywords, 2, 2000)) {
-    return 'Aucun mot-clé pertinent.';
-  }
+  if (!isNonEmptyString(keywords, 2, 2000)) return 'Aucun mot-clé pertinent.';
 
-  const normalizedKeywords = keywords
+  const kws = keywords
     .toLowerCase()
     .replace(/[^\p{L}\p{N}\s-]/gu, ' ')
     .split(/\s+/)
-    .filter((word) => word.length >= 3)
-    .slice(0, 8);
+    .filter((w) => w.length >= 3)
+    .slice(0, 10);
 
-  if (!normalizedKeywords.length) {
-    return 'Aucun mot-clé pertinent extrait.';
-  }
+  if (!kws.length) return 'Aucun mot-clé pertinent extrait.';
 
   try {
-    const db = getDb();
-    const snapshot = await db.collection('plants').get();
+    const plants = await getCachedPlants();
 
-    const matches = [];
-    snapshot.forEach((doc) => {
-      const p = doc.data();
-      const searchable = [p.name, p.latin_name, p.properties, p.usage, p.full_text]
-        .filter(Boolean).join(' ').toLowerCase();
-      const score = normalizedKeywords.filter((kw) => searchable.includes(kw)).length;
-      if (score > 0) matches.push({ ...p, score });
-    });
+    const scored = plants.map((p) => {
+      const name       = (p.name        || '').toLowerCase();
+      const latin      = (p.latin_name  || '').toLowerCase();
+      const props      = (p.properties  || '').toLowerCase();
+      const usage      = (p.usage       || '').toLowerCase();
+      const fullText   = (p.full_text   || '').toLowerCase();
 
-    matches.sort((a, b) => b.score - a.score);
-    const top = matches.slice(0, 5);
+      const score = kws.reduce((acc, kw) => {
+        if (name.includes(kw) || latin.includes(kw)) return acc + 4;
+        if (props.includes(kw) || usage.includes(kw)) return acc + 2;
+        if (fullText.includes(kw))                    return acc + 1;
+        return acc;
+      }, 0);
+
+      return { ...p, score };
+    }).filter((p) => p.score > 0);
+
+    scored.sort((a, b) => b.score - a.score);
+    const top = scored.slice(0, 5);
 
     if (!top.length) return 'Aucune plante correspondante trouvée en base.';
 
     return top.map((p) => [
-      `- ${p.name || 'Plante inconnue'} (${p.latin_name || 'latin non renseigné'})`,
+      `- ${p.name || 'Plante inconnue'} (${p.latin_name || 'latin non renseigné'}) [score:${p.score}]`,
       `  Propriétés: ${p.properties || 'non renseignées'}`,
       `  Usage: ${p.usage || 'non renseigné'}`,
       `  Posologie: ${p.dosage || 'non renseignée'}`,
