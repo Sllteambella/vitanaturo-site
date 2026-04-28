@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>VitaNaturo — Votre guide en phytothérapie</title>
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#5d9e72">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="VitaNaturo">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<!-- SEO / Open Graph -->
+<meta name="description" content="Conseils en phytothérapie personnalisés par IA. Première question gratuite, sans inscription.">
+<meta property="og:title" content="VitaNaturo — Phytothérapie par IA">
+<meta property="og:description" content="Première question gratuite. Réponse experte en quelques secondes.">
+<meta property="og:image" content="/images/frame0-herbs.jpg">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=Lora:ital@0;1&display=swap" rel="stylesheet">
@@ -1253,6 +1269,13 @@ async function submitQuestion(e) {
     errorBox.textContent      = 'Une erreur est survenue. Vérifiez votre connexion et réessayez.';
     errorBox.style.display    = 'block';
   }
+}
+
+/* ─── SERVICE WORKER ───────────── */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
 }
 </script>
 </body>
