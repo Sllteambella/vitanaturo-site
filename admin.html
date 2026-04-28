@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VitaNaturo — Admin Import Plantes</title>
+<style>
+:root {
+  --bg: #090f0b; --surface: #0f1a12; --surface2: #152019;
+  --accent: #5d9e72; --gold: #c4a55a; --text: #f0ead8;
+  --muted: #7a9484; --border: rgba(93,158,114,0.18);
+  --error: #e07070; --success: #5d9e72;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; font-size: 15px; line-height: 1.6; padding: 2rem; min-height: 100vh; }
+.container { max-width: 800px; margin: 0 auto; }
+header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.logo { font-family: Georgia, serif; font-size: 1.3rem; letter-spacing: .06em; }
+.logo span { color: var(--accent); font-style: italic; }
+.badge { font-size: .6rem; letter-spacing: .2em; text-transform: uppercase; background: rgba(196,165,90,.12); border: 1px solid rgba(196,165,90,.25); color: var(--gold); padding: .25rem .7rem; border-radius: 100px; }
+
+/* Auth */
+#authSection { max-width: 360px; margin: 4rem auto; }
+h2 { font-size: 1.1rem; font-weight: 500; margin-bottom: 1.5rem; color: var(--muted); }
+input[type=password], input[type=text], select {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 3px; padding: .8rem 1rem; color: var(--text);
+  font-size: .9rem; outline: none; transition: border-color .2s;
+}
+input:focus, select:focus { border-color: var(--accent); }
+label { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: .4rem; margin-top: 1rem; }
+button {
+  background: var(--accent); color: var(--bg); border: none; border-radius: 3px;
+  padding: .8rem 2rem; font-size: .8rem; font-weight: 600; letter-spacing: .1em;
+  text-transform: uppercase; cursor: pointer; transition: background .2s;
+  margin-top: 1.25rem;
+}
+button:hover { background: #6db885; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+.btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); background: transparent; }
+
+/* Import section */
+#importSection { display: none; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1.75rem; margin-bottom: 1.5rem; }
+.card-title { font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.25rem; }
+
+/* CSV format doc */
+.columns-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.columns-table th { text-align: left; padding: .5rem .75rem; font-size: .65rem; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
+.columns-table td { padding: .55rem .75rem; border-bottom: 1px solid rgba(93,158,114,.07); vertical-align: top; }
+.columns-table tr:last-child td { border-bottom: none; }
+.col-name { color: var(--accent); font-family: monospace; font-size: .85rem; }
+.col-req { color: var(--gold); font-size: .7rem; }
+.col-desc { color: var(--muted); }
+.col-ex { color: rgba(240,234,216,.5); font-style: italic; font-size: .78rem; }
+
+/* Drop zone */
+.drop-zone {
+  border: 2px dashed var(--border); border-radius: 4px; padding: 2.5rem;
+  text-align: center; cursor: pointer; transition: border-color .2s, background .2s;
+  margin-top: 1rem;
+}
+.drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(93,158,114,.04); }
+.drop-zone svg { opacity: .4; margin-bottom: .75rem; }
+.drop-zone p { color: var(--muted); font-size: .88rem; }
+.drop-zone strong { color: var(--accent); }
+#fileInput { display: none; }
+#fileName { margin-top: .75rem; font-size: .8rem; color: var(--accent); }
+
+/* Preview */
+#previewSection { display: none; }
+.preview-stats { display: flex; gap: 1.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.stat { background: var(--surface2); border: 1px solid var(--border); border-radius: 3px; padding: .6rem 1rem; font-size: .82rem; }
+.stat strong { color: var(--accent); font-size: 1.1rem; display: block; }
+.preview-table-wrap { overflow-x: auto; max-height: 260px; overflow-y: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+thead th { position: sticky; top: 0; background: var(--surface2); padding: .5rem .75rem; text-align: left; font-size: .65rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
+tbody td { padding: .45rem .75rem; border-bottom: 1px solid rgba(93,158,114,.06); color: var(--muted); max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+tbody tr:hover td { background: var(--surface2); }
+.row-valid td:first-child { border-left: 2px solid var(--accent); }
+.row-error td:first-child { border-left: 2px solid var(--error); }
+
+/* Log */
+#logSection { display: none; }
+.log { background: #060d08; border: 1px solid var(--border); border-radius: 3px; padding: 1rem; font-family: monospace; font-size: .78rem; max-height: 260px; overflow-y: auto; }
+.log-line { padding: .15rem 0; }
+.log-ok { color: var(--success); }
+.log-err { color: var(--error); }
+.log-info { color: var(--muted); }
+
+/* Alert */
+.alert { padding: .75rem 1rem; border-radius: 3px; font-size: .82rem; margin-bottom: 1rem; }
+.alert-error { background: rgba(224,112,112,.08); border: 1px solid rgba(224,112,112,.3); color: var(--error); }
+.alert-success { background: rgba(93,158,114,.08); border: 1px solid rgba(93,158,114,.3); color: var(--success); }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo">Vita<span>Naturo</span></div>
+    <div class="badge">Admin · Import Plantes</div>
+  </header>
+
+  <!-- Auth -->
+  <div id="authSection">
+    <h2>Accès sécurisé</h2>
+    <div id="authError"></div>
+    <label for="passwordInput">Mot de passe admin</label>
+    <input type="password" id="passwordInput" placeholder="••••••••" autocomplete="current-password">
+    <button onclick="login()">Connexion →</button>
+  </div>
+
+  <!-- Import -->
+  <div id="importSection">
+
+    <!-- Format CSV -->
+    <div class="card">
+      <div class="card-title">Format du CSV attendu</div>
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">La première ligne doit contenir les en-têtes. Séparateur : virgule. Encodage : UTF-8.</p>
+      <table class="columns-table">
+        <thead><tr><th>Colonne</th><th>Requis</th><th>Description</th><th>Exemple</th></tr></thead>
+        <tbody>
+          <tr><td class="col-name">name</td><td class="col-req">✦ Oui</td><td class="col-desc">Nom commun de la plante</td><td class="col-ex">Lavande officinale</td></tr>
+          <tr><td class="col-name">latin_name</td><td></td><td class="col-desc">Nom scientifique</td><td class="col-ex">Lavandula angustifolia</td></tr>
+          <tr><td class="col-name">categories</td><td></td><td class="col-desc">Catégories séparées par |</td><td class="col-ex">calmante|anxiolytique</td></tr>
+          <tr><td class="col-name">properties</td><td></td><td class="col-desc">Propriétés thérapeutiques</td><td class="col-ex">Sédative, antispasmodique...</td></tr>
+          <tr><td class="col-name">usage</td><td></td><td class="col-desc">Modes d'utilisation</td><td class="col-ex">Infusion, huile essentielle</td></tr>
+          <tr><td class="col-name">dosage</td><td></td><td class="col-desc">Posologie recommandée</td><td class="col-ex">2g/tasse, 3x/jour</td></tr>
+          <tr><td class="col-name">contraindications</td><td></td><td class="col-desc">Contre-indications</td><td class="col-ex">Grossesse 1er trimestre</td></tr>
+          <tr><td class="col-name">sources</td><td></td><td class="col-desc">Sources scientifiques</td><td class="col-ex">ANSM, ESCOP, Commission E</td></tr>
+          <tr><td class="col-name">full_text</td><td></td><td class="col-desc">Texte complet pour la recherche</td><td class="col-ex">La lavande est utilisée depuis...</td></tr>
+        </tbody>
+      </table>
+      <button class="btn-secondary" onclick="downloadTemplate()" style="margin-top:1rem;font-size:.72rem;padding:.6rem 1.2rem">⬇ Télécharger le modèle CSV</button>
+    </div>
+
+    <!-- Upload -->
+    <div class="card">
+      <div class="card-title">Importer un fichier CSV</div>
+      <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path d="M18 4v20M10 12l8-8 8 8M6 28h24" stroke="#5d9e72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <p>Glissez votre fichier ici ou <strong>cliquez pour parcourir</strong></p>
+        <p style="font-size:.72rem;margin-top:.3rem">CSV · UTF-8 · Max 5 Mo</p>
+      </div>
+      <input type="file" id="fileInput" accept=".csv,text/csv">
+      <div id="fileName"></div>
+    </div>
+
+    <!-- Preview -->
+    <div class="card" id="previewSection">
+      <div class="card-title">Aperçu</div>
+      <div id="previewAlert"></div>
+      <div class="preview-stats" id="previewStats"></div>
+      <div class="preview-table-wrap"><table id="previewTable"></table></div>
+      <div style="display:flex;gap:.75rem;margin-top:1.25rem;flex-wrap:wrap">
+        <button id="importBtn" onclick="runImport()">Importer dans Firestore →</button>
+        <button class="btn-secondary" onclick="resetUpload()">Annuler</button>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="card" id="logSection">
+      <div class="card-title">Résultat de l'import</div>
+      <div class="log" id="log"></div>
+      <button class="btn-secondary" onclick="resetUpload()" style="margin-top:1rem">Nouvel import</button>
+    </div>
+
+  </div><!-- /importSection -->
+</div>
+
+<script>
+let sessionToken = null;
+let parsedRows   = [];
+
+/* ─── AUTH ─── */
+async function login() {
+  const pwd = document.getElementById('passwordInput').value.trim();
+  if (!pwd) return;
+  const res = await fetch('/api/admin/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pwd }),
+  });
+  if (res.ok) {
+    const { token } = await res.json();
+    sessionToken = token;
+    document.getElementById('authSection').style.display  = 'none';
+    document.getElementById('importSection').style.display = 'block';
+  } else {
+    const el = document.getElementById('authError');
+    el.className = 'alert alert-error';
+    el.textContent = 'Mot de passe incorrect.';
+  }
+}
+document.getElementById('passwordInput').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+
+/* ─── CSV PARSE ─── */
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  const headers = splitCSVLine(lines[0]);
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    const vals = splitCSVLine(lines[i]);
+    const obj = {};
+    headers.forEach((h, idx) => { obj[h.trim()] = (vals[idx] || '').trim(); });
+    rows.push(obj);
+  }
+  return { headers, rows };
+}
+
+function splitCSVLine(line) {
+  const result = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] === '"') { inQ = !inQ; }
+    else if (line[i] === ',' && !inQ) { result.push(cur); cur = ''; }
+    else { cur += line[i]; }
+  }
+  result.push(cur);
+  return result;
+}
+
+/* ─── FILE HANDLING ─── */
+const dropZone  = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+
+function handleFile(file) {
+  if (!file) return;
+  document.getElementById('fileName').textContent = '📄 ' + file.name;
+  const reader = new FileReader();
+  reader.onload = e => showPreview(e.target.result);
+  reader.readAsText(file, 'UTF-8');
+}
+
+function showPreview(csvText) {
+  const { headers, rows } = parseCSV(csvText);
+  parsedRows = rows;
+
+  const valid   = rows.filter(r => r.name && r.name.length > 0);
+  const invalid = rows.filter(r => !r.name || r.name.length === 0);
+
+  const alertEl = document.getElementById('previewAlert');
+  if (!headers.includes('name')) {
+    alertEl.className = 'alert alert-error';
+    alertEl.textContent = '❌ Colonne "name" manquante — vérifiez les en-têtes de votre CSV.';
+    document.getElementById('importBtn').disabled = true;
+  } else if (invalid.length) {
+    alertEl.className = 'alert alert-error';
+    alertEl.textContent = `⚠️ ${invalid.length} ligne(s) sans nom seront ignorées.`;
+    document.getElementById('importBtn').disabled = false;
+  } else {
+    alertEl.className = '';
+    alertEl.textContent = '';
+    document.getElementById('importBtn').disabled = false;
+  }
+
+  document.getElementById('previewStats').innerHTML = `
+    <div class="stat"><strong>${rows.length}</strong>Lignes totales</div>
+    <div class="stat"><strong>${valid.length}</strong>Valides</div>
+    <div class="stat"><strong>${headers.length}</strong>Colonnes</div>
+  `;
+
+  // Table
+  const table = document.getElementById('previewTable');
+  const previewCols = ['name', 'latin_name', 'categories', 'properties', 'dosage'];
+  const cols = previewCols.filter(c => headers.includes(c));
+  table.innerHTML = `<thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+    <tbody>${rows.slice(0, 10).map(r => `
+      <tr class="${r.name ? 'row-valid' : 'row-error'}">
+        ${cols.map(c => `<td title="${(r[c]||'').replace(/"/g,'')}">${r[c] || '<span style="opacity:.3">—</span>'}</td>`).join('')}
+      </tr>`).join('')}
+    </tbody>`;
+
+  document.getElementById('previewSection').style.display = 'block';
+}
+
+/* ─── IMPORT ─── */
+async function runImport() {
+  const btn = document.getElementById('importBtn');
+  btn.disabled = true;
+  btn.textContent = 'Import en cours…';
+
+  const validRows = parsedRows.filter(r => r.name && r.name.length > 0);
+  document.getElementById('previewSection').style.display = 'none';
+  document.getElementById('logSection').style.display     = 'block';
+
+  const log = document.getElementById('log');
+  log.innerHTML = `<div class="log-info">Envoi de ${validRows.length} plantes vers Firestore…</div>`;
+
+  try {
+    const res = await fetch('/api/admin/import', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': sessionToken },
+      body: JSON.stringify({ rows: validRows }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erreur serveur');
+
+    data.results.forEach(r => {
+      const div = document.createElement('div');
+      div.className = `log-line ${r.ok ? 'log-ok' : 'log-err'}`;
+      div.textContent = r.ok ? `✓ ${r.name} (${r.id})` : `✗ ${r.name} — ${r.error}`;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    });
+
+    const summary = document.createElement('div');
+    summary.className = 'log-info';
+    summary.style.marginTop = '.5rem';
+    summary.textContent = `── ${data.imported} importées · ${data.errors} erreurs ──`;
+    log.appendChild(summary);
+  } catch (err) {
+    const div = document.createElement('div');
+    div.className = 'log-line log-err';
+    div.textContent = '❌ ' + err.message;
+    log.appendChild(div);
+  }
+}
+
+/* ─── RESET ─── */
+function resetUpload() {
+  parsedRows = [];
+  fileInput.value = '';
+  document.getElementById('fileName').textContent     = '';
+  document.getElementById('previewSection').style.display = 'none';
+  document.getElementById('logSection').style.display     = 'none';
+  document.getElementById('previewAlert').textContent     = '';
+}
+
+/* ─── TEMPLATE ─── */
+function downloadTemplate() {
+  const header = 'name,latin_name,categories,properties,usage,dosage,contraindications,sources,full_text';
+  const ex = 'Lavande officinale,Lavandula angustifolia,calmante|anxiolytique,"Sédative, antispasmodique, antibactérienne","Infusion 2g/tasse, huile essentielle","2 gouttes HE 3x/jour","Grossesse 1er trimestre","ANSM; ESCOP","La lavande est une plante aromatique..."';
+  const blob = new Blob([header + '\n' + ex], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'modele_plantes.csv'; a.click();
+}
+</script>
+</body>
+</html>
