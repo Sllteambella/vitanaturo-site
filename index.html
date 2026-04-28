@@ -687,7 +687,7 @@ footer {
     <li><a href="#bot">Le bot</a></li>
     <li><a href="#faq">FAQ</a></li>
   </ul>
-  <button class="nav-cta" onclick="document.getElementById('question').focus()">Question gratuite</button>
+  <button class="nav-cta" onclick="document.getElementById('questionText').focus()">Question gratuite</button>
 </nav>
 
 <!-- ─── HERO ──────────────────────────────────────── -->
@@ -703,7 +703,7 @@ footer {
       <h1 class="hero-title" id="heroTitle">Les plantes<br>comme première<br><em>médecine</em></h1>
       <p class="hero-tagline" id="heroTagline">Un premier avis gratuit, des conseils sur-mesure, un praticien si besoin.</p>
       <div class="hero-actions">
-        <button class="btn-primary" onclick="document.getElementById('question').focus()">Poser ma première question</button>
+        <button class="btn-primary" onclick="document.getElementById('questionText').focus()">Poser ma première question</button>
         <a href="#tarifs" class="btn-ghost">Voir les formules →</a>
       </div>
     </div>
@@ -741,6 +741,7 @@ footer {
         <div><label class="form-label" for="fieldAge">Âge *</label><input id="fieldAge" type="number" placeholder="42" min="1" max="120" required></div>
         <div><label class="form-label" for="fieldPoids">Poids (kg) *</label><input id="fieldPoids" type="number" placeholder="68" min="20" max="300" required></div>
         <div><label class="form-label" for="fieldTaille">Taille (cm) *</label><input id="fieldTaille" type="number" placeholder="170" min="50" max="250" required></div>
+
       </div>
       <div class="form-row">
         <div><label class="form-label" for="fieldVille">Ville</label><input id="fieldVille" type="text" placeholder="Lyon"></div>
@@ -1042,7 +1043,7 @@ footer {
   <h2 class="cta-title reveal">Votre première question<br>est <em>gratuite</em></h2>
   <p class="cta-sub reveal">Pas d'inscription, pas de carte bancaire. Juste votre question et une réponse d'expert.</p>
   <div class="cta-actions reveal">
-    <button class="btn-primary" onclick="document.getElementById('question').focus();document.getElementById('freeQuestion').scrollIntoView({behavior:'smooth'})">Poser ma question →</button>
+    <button class="btn-primary" onclick="document.getElementById('questionText').focus();document.getElementById('freeQuestion').scrollIntoView({behavior:'smooth'})">Poser ma question →</button>
     <a href="#tarifs" class="btn-ghost">Voir les formules →</a>
   </div>
 </section>
