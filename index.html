@@ -93,8 +93,16 @@ nav.scrolled {
   font-family: var(--font-display);
   font-size: 1.3rem; font-weight: 400; letter-spacing: .06em;
   color: var(--text);
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0;
+  line-height: 1.1;
 }
 .nav-logo span { color: var(--accent); font-style: italic; }
+.nav-logo-sub {
+  font-family: var(--font-display);
+  font-size: .6rem; font-style: italic; font-weight: 300;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--gold); opacity: .85;
+}
 .nav-links {
   display: flex; gap: 2.5rem; list-style: none;
   font-size: .72rem; letter-spacing: .15em; text-transform: uppercase;
@@ -696,7 +704,10 @@ footer {
 
 <!-- ─── NAV ───────────────────────────────────────── -->
 <nav id="navbar">
-  <a href="#" class="nav-logo">Vita<span>Naturo</span></a>
+  <a href="#" class="nav-logo">
+    <span style="color:var(--text)">Vita<span>Naturo</span></span>
+    <span class="nav-logo-sub">Divinus Tactus</span>
+  </a>
   <ul class="nav-links">
     <li><a href="#comment">Comment ça marche</a></li>
     <li><a href="#tarifs">Tarifs</a></li>
@@ -1069,6 +1080,7 @@ footer {
   <div class="footer-grid">
     <div>
       <div class="footer-brand-name">Vita<span>Naturo</span></div>
+      <div style="font-family:var(--font-display);font-style:italic;font-size:.75rem;letter-spacing:.18em;color:var(--gold);opacity:.8;margin-top:-.4rem;margin-bottom:.85rem">Divinus Tactus</div>
       <p class="footer-tagline">La phytothérapie accessible à tous. Des conseils naturels, sourcés et personnalisés — du bot à la consultation.</p>
       <p class="footer-legal">© 2026 VitaNaturo · Mentions légales · Politique de confidentialité</p>
     </div>
