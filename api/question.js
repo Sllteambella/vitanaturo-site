@@ -236,7 +236,7 @@ async function notifyAdmin(email, question, answer, body) {
   const imc = (normalizedPoids && normalizedTaille) ? (normalizedPoids / Math.pow(normalizedTaille / 100, 2)).toFixed(1) : null;
 
   const header = [
-    `🌿 *Nouveau lead VitaNaturo*`,
+    `🌿 *Nouveau lead VitaNaturo – Divinus Tactus*`,
     ``,
     `👤 ${escapeTelegramMarkdown(cleanOptionalString(prenom, 80) || '')} ${escapeTelegramMarkdown(cleanOptionalString(nom, 80) || '')}, ${escapeTelegramMarkdown(String(toBoundedNumber(age, 0, 120) ?? '?'))} ans — ${escapeTelegramMarkdown(cleanOptionalString(ville, 120) || '?')}`,
     imc ? `📊 IMC : ${escapeTelegramMarkdown(imc)} | ${escapeTelegramMarkdown(String(normalizedPoids))}kg / ${escapeTelegramMarkdown(String(normalizedTaille))}cm` : '',
