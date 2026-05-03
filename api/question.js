@@ -121,8 +121,12 @@ export default async function handler(req, res) {
         taille: normalizedTaille,
         imc: imc ? parseFloat(imc) : null,
         ville: cleanOptionalString(ville, 120) || null,
+        telegram: cleanOptionalString(telegram, 120) || null,
+        allergies: cleanOptionalString(allergies, 600) || null,
+        traitements: cleanOptionalString(traitements, 600) || null,
         question: trimmedQuestion,
         answer,
+        source: 'site_form',
         dry_run: isDryRun,
       }),
       ...(!isDryRun ? [
@@ -132,7 +136,7 @@ export default async function handler(req, res) {
       ] : []),
     ]);
 
-    res.json({ ok: true, dryRun: isDryRun });
+    res.json({ ok: true, dryRun: isDryRun, answer });
   } catch (err) {
     console.error('Question API error:', err.message);
     res.status(500).json({ error: 'Internal error' });
