@@ -33,7 +33,8 @@ ANSM, ESCOP, Commission E allemande, études cliniques PubMed si disponibles.
 🩺 **7. Quand consulter**
 Signes d'alerte nécessitant une consultation médicale urgente.
 
-Réponds en français. Sois précis, sourcé et bienveillant. Personalise la réponse avec le prénom du patient. Termine en invitant à continuer sur le bot Telegram VitaNaturo pour un suivi personnalisé.`;
+Réponds en français. Sois précis, sourcé et bienveillant. Personalise la réponse avec le prénom du patient.
+Utilise le format Markdown standard (# ## ### pour les titres, **gras**, *italique*, - pour les listes, --- pour les séparateurs). N'échappe JAMAIS les caractères spéciaux avec des backslashes.`;
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
