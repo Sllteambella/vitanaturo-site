@@ -131,7 +131,22 @@ export default async function handler(req, res) {
       }),
       ...(!isDryRun ? [
         sendEmail(email, trimmedQuestion, answer),
-        process.env.HUBSPOT_TOKEN ? hubspotUpsert(email, trimmedQuestion, answer) : Promise.resolve(),
+        process.env.HUBSPOT_TOKEN ? hubspotUpsert({
+          email,
+          prenom:      cleanOptionalString(prenom, 80) || null,
+          nom:         cleanOptionalString(nom, 80) || null,
+          age:         normalizedAge,
+          poids:       normalizedPoids,
+          taille:      normalizedTaille,
+          imc:         imc ? parseFloat(imc) : null,
+          imcLabel,
+          ville:       cleanOptionalString(ville, 120) || null,
+          telegram:    cleanOptionalString(telegram, 120) || null,
+          allergies:   cleanOptionalString(allergies, 600) || null,
+          traitements: cleanOptionalString(traitements, 600) || null,
+          question:    trimmedQuestion,
+          answer,
+        }) : Promise.resolve(),
         process.env.TELEGRAM_ADMIN_ID ? notifyAdmin(email, trimmedQuestion, answer, body) : Promise.resolve(),
       ] : []),
     ]);
@@ -191,41 +206,84 @@ async function sendEmail(to, question, answer) {
   });
 }
 
-async function hubspotUpsert(email, question, answer) {
+async function hubspotUpsert({ email, prenom, nom, age, poids, taille, imc, imcLabel, ville, telegram, allergies, traitements, question, answer }) {
   const headers = {
     'Authorization': `Bearer ${process.env.HUBSPOT_TOKEN}`,
     'Content-Type': 'application/json',
   };
 
+  // Contact properties (standard HubSpot fields)
+  const contactProps = {
+    email,
+    lifecyclestage:  'lead',
+    hs_lead_status:  'NEW',
+    ...(prenom && { firstname: prenom }),
+    ...(nom    && { lastname:  nom }),
+    ...(ville  && { city:      ville }),
+  };
+
+  // Try to create — 409 means contact already exists
   let contactId;
   const createRes = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
     method: 'POST',
     headers,
-    body: JSON.stringify({ properties: { email, lifecyclestage: 'lead', hs_lead_status: 'NEW' } }),
+    body: JSON.stringify({ properties: contactProps }),
   });
 
   if (createRes.ok) {
     contactId = (await createRes.json()).id;
   } else if (createRes.status === 409) {
+    // Fetch existing contact ID
     const getRes = await fetch(
       `https://api.hubapi.com/crm/v3/objects/contacts/${encodeURIComponent(email)}?idProperty=email`,
       { headers },
     );
-    if (getRes.ok) contactId = (await getRes.json()).id;
+    if (getRes.ok) {
+      const existing = await getRes.json();
+      contactId = existing.id;
+      // Update with latest profile data
+      await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ properties: contactProps }),
+      });
+    }
   }
 
   if (!contactId) return;
+
+  // Build rich note body
+  const profileLines = [
+    `👤 ${[prenom, nom].filter(Boolean).join(' ') || '—'}`,
+    age    ? `🎂 Âge : ${age} ans` : null,
+    (poids || taille) ? `⚖️  ${poids ?? '?'} kg / ${taille ?? '?'} cm${imc ? ` — IMC : ${imc} (${imcLabel})` : ''}` : null,
+    ville    ? `📍 Ville : ${ville}` : null,
+    telegram ? `✈️  Telegram : ${telegram}` : null,
+    allergies   ? `⚠️  Allergies : ${allergies}` : null,
+    traitements ? `💊 Traitements : ${traitements}` : null,
+  ].filter(Boolean).join('\n');
+
+  const noteBody = [
+    '── PROFIL ──────────────────────',
+    profileLines,
+    '',
+    '── QUESTION ────────────────────',
+    question,
+    '',
+    '── RÉPONSE DR. VITANATURO ──────',
+    answer,
+  ].join('\n');
 
   await fetch('https://api.hubapi.com/crm/v3/objects/notes', {
     method: 'POST',
     headers,
     body: JSON.stringify({
       properties: {
-        hs_note_body: `❓ Question site VitaNaturo :\n${question}\n\n💬 Réponse IA :\n${answer}`,
-        hs_timestamp: String(Date.now()),
+        hs_note_body:  noteBody,
+        hs_timestamp:  String(Date.now()),
       },
       associations: [{
-        to: { id: contactId },
+        to:    { id: contactId },
         types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 202 }],
       }],
     }),
