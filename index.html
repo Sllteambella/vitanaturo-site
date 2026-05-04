@@ -106,13 +106,13 @@ nav.scrolled {
 .nav-links {
   display: flex; gap: 2.5rem; list-style: none;
   font-size: .72rem; letter-spacing: .15em; text-transform: uppercase;
-  color: var(--muted);
+  color: rgba(240,234,216,.75);
 }
-.nav-links a { transition: color .2s; }
+.nav-links a { transition: color .2s; text-shadow: 0 1px 6px rgba(9,15,11,.6); }
 .nav-links a:hover { color: var(--text); cursor: none; }
 .nav-cta {
   background: var(--accent); color: var(--bg);
-  padding: .65rem 1.6rem; border: none; border-radius: 1px;
+  padding: .65rem 1.6rem; border: 1px solid rgba(255,255,255,.15); border-radius: 1px;
   font-family: var(--font-body); font-size: .72rem; font-weight: 600;
   letter-spacing: .12em; text-transform: uppercase; cursor: none;
   transition: background .2s, transform .15s;
@@ -125,6 +125,10 @@ nav.scrolled {
 }
 .hero-sticky {
   position: sticky; top: 0; height: 100vh; overflow: hidden;
+}
+.hero-sticky::after {
+  content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(9,15,11,.55) 0%, rgba(9,15,11,.0) 18%);
 }
 .hero-frame {
   position: absolute; inset: 0;
