@@ -1065,26 +1065,14 @@ footer {
       </div>
       <div class="bot-messages" id="botMessages">
         <div class="msg bot">
-          Bonjour ! Je suis votre assistant en phytothérapie. Quelle est votre question ?
+          Bonjour ! Je suis votre agent conseiller en phytothérapie. Posez-moi votre question ci-dessous — je vous guiderai vers le formulaire pour personnaliser ma réponse.
           <div class="msg-time">09:14</div>
-        </div>
-        <div class="msg user">
-          J'ai des troubles du sommeil depuis 2 semaines, j'évite les somnifères. Que me conseillez-vous ?
-          <div class="msg-time">09:15</div>
         </div>
       </div>
       <div class="bot-typing" id="botTyping" style="display:none;margin:0 1.25rem .75rem">
         <div class="typing-dot"></div>
         <div class="typing-dot"></div>
         <div class="typing-dot"></div>
-      </div>
-      <div class="bot-upsell" id="botUpsell" style="display:none">
-        <div class="upsell-title">Aller plus loin</div>
-        <div style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem">Pour un suivi complet de votre sommeil :</div>
-        <div class="upsell-options">
-          <div class="upsell-opt">Pack 3 questions — 20 €</div>
-          <div class="upsell-opt">Consultation praticien — 85 €</div>
-        </div>
       </div>
       <div class="bot-input-bar">
         <input class="bot-input" id="botInput" placeholder="Posez votre question...">
@@ -1332,27 +1320,43 @@ function toggleFaq(el) {
 }
 
 /* ─── BOT DEMO ─────────────────── */
-const botResponses = [
-  'Le <strong>tilleul</strong> (Tilia cordata) et la <strong>passiflore</strong> (Passiflora incarnata) sont d\'excellents hypnotiques doux. En infusion : 2g/tasse de tilleul, 15 min avant coucher. La passiflore agit sur l\'anxiété sous-jacente au sommeil. Aucune interaction connue avec les médicaments courants. Voulez-vous des précisions sur les formes (gélules, teinture-mère) ?',
-];
 let botDemoStep = 0;
 function triggerBotDemo() {
   if (botDemoStep > 0) return;
+  const question = document.getElementById('botInput').value.trim();
+  if (!question) return;
   botDemoStep = 1;
   const msgs = document.getElementById('botMessages');
   const typing = document.getElementById('botTyping');
-  const upsell = document.getElementById('botUpsell');
+
+  // Show user message
+  const uMsg = document.createElement('div');
+  uMsg.className = 'msg user';
+  const now = new Date();
+  const t = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+  uMsg.innerHTML = question.replace(/</g,'&lt;') + '<div class="msg-time">' + t + '</div>';
+  msgs.appendChild(uMsg);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Show typing then redirect message
   typing.style.display = 'flex';
   msgs.scrollTop = msgs.scrollHeight;
   setTimeout(() => {
     typing.style.display = 'none';
     const msg = document.createElement('div');
     msg.className = 'msg bot';
-    msg.innerHTML = botResponses[0] + '<div class="msg-time">09:16</div>';
+    msg.innerHTML = 'Pour vous répondre avec précision, j\'ai besoin de quelques informations : âge, allergies éventuelles, traitements en cours… Complétez votre profil en 1 minute et recevez votre conseil personnalisé par email. <br><br><a onclick="prefillAndScroll()" style="cursor:pointer;color:var(--accent);font-weight:600;text-decoration:underline">→ Compléter le formulaire</a><div class="msg-time">' + t + '</div>';
     msgs.appendChild(msg);
     msgs.scrollTop = msgs.scrollHeight;
-    setTimeout(() => { upsell.style.display = 'flex'; }, 800);
-  }, 2200);
+  }, 1800);
+}
+function prefillAndScroll() {
+  const question = document.getElementById('botInput').value.trim();
+  if (question) {
+    const qt = document.getElementById('questionText');
+    if (qt) qt.value = question;
+  }
+  document.getElementById('freeQuestion').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 document.getElementById('botInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') triggerBotDemo();
